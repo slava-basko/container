@@ -1,4 +1,14 @@
 {
+  "name": "slava-basko/container",
+  "type": "library",
+  "description": "Dependency injection container.",
+  "keywords": ["container", "dependency", "injection", "di", "service"],
+  "authors": [
+    {
+      "name": "Slava Basko",
+      "email": "basko.slava@gmail.com"
+    }
+  ],
   "require": {
     "php": ">=7.1"
   },

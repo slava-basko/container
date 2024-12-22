@@ -1,6 +1,8 @@
 # Dependency Injection Container
 
-For those who understand what it is and crave simplicity.
+For those who understand what it is and strive for simplicity.
+
+Zero dependencies and PHP 7.1+.
 
 ## Features
 * Simple API: Container API is as simple as regular array API.
