@@ -1,0 +1,16 @@
+* text=auto
+*.php text
+*.md text
+*.xml text
+
+# Ignore meta data
+/tests export-ignore
+/.gitignore export-ignore
+/.gitattributes export-ignore
+/.editorconfig export-ignore
+/phpunit.xml export-ignore
+/phpcs.xml export-ignore
+/README.md export-ignore
+/Makefile export-ignore
+/run-tests.sh export-ignore
+/phpstan.neon export-ignore

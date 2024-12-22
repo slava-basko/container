@@ -1,0 +1,6 @@
+parameters:
+    level: 9
+    scanFiles:
+        - tests/psr.php
+    paths:
+        - src
