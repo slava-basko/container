@@ -22,6 +22,14 @@ class B {
     public function __construct(A $a) {}
 }
 
+class A2 {
+    public function __construct(B2 $b) {}
+}
+
+class B2 {
+    public function setA2(A2 $a) {}
+}
+
 class C {}
 
 class D {}
