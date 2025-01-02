@@ -71,7 +71,7 @@ Use `Container::extend()` to modify services by a common parent, for example.
 $container = new Container();
 $container[\Logger::class] = fn () => new \Logger();
 $container[\SomeRepository::class] = fn () => new \SomeRepository();
-$container->extend(\BaseRepository::class, function (\SomeRepository $repository, Container $c) {
+$container->extend(\BaseRepository::class, function (\BaseRepository $repository, Container $c) {
     $repository->setLogger($c[\Logger::class]);
 
     return $repository;

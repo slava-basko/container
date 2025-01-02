@@ -84,7 +84,7 @@ class ExtendTest extends TestCase
     {
         $container = new Container();
         $container['k'] = 'v';
-        $container->extend(\BaseRepository::class, function (\SomeRepository $repository, Container $c) {
+        $container->extend(\BaseRepository::class, function (\BaseRepository $repository, Container $c) {
             $repository->setLogger($c[\Logger::class]);
 
             return $repository;
@@ -96,13 +96,7 @@ class ExtendTest extends TestCase
     public function testAutowireExtend()
     {
         $container = new AutowireContainer();
-        $container[\Logger::class] = function () {
-            return new \Logger();
-        };
-        $container[\SomeRepository::class] = function () {
-            return new \SomeRepository();
-        };
-        $container->extend(\BaseRepository::class, function (\SomeRepository $repository, Container $c) {
+        $container->extend(\BaseRepository::class, function (\BaseRepository $repository, Container $c) {
             $repository->setLogger($c[\Logger::class]);
 
             return $repository;
