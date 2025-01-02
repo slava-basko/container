@@ -17,7 +17,7 @@ class TagsTest extends TestCase
         }, ['some-tag']);
         $container->add(\D::class, function () {
             return new \D();
-        }, ['some-tag']);
+        }, ['some-tag', 'some-another-tag']);
         $container->add(\E::class, function () {
             return new \E();
         });
