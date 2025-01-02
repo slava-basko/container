@@ -46,6 +46,11 @@ $logger = $container[Logger::class];
 
 $logger->warning('Oops!');
 ```
+You need to use `Container::getByTag()` method to retrieve services by tags.
+
+This separate method exists on purpose since regular `get` from the container should return either a specific service 
+or a `NotFoundException` exception. There should not be a service or an array of services. Only one type should be 
+returned.
 
 ### Shared Instances
 Use `Container::share()` wrapper or `Container::addShared()` method to create a shareable service. 
