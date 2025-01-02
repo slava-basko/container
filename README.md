@@ -36,7 +36,7 @@ $container->add('file-handler', fn (Container $c) => new StreamHandler($c['log-f
 $container->add('stdout-handler', fn (Container $c) => new StreamHandler('php://output'), ['handler']);
 $container[Logger::class] = function (Container $c) {
     $logger = new Logger('app');
-    $logger->setHandlers($c['handler']);
+    $logger->setHandlers($c->getByTag('handler'));
 
     return $logger;
 };

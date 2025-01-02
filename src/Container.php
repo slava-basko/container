@@ -95,7 +95,7 @@ class Container implements ArrayAccess
 
     /**
      * @param $offset
-     * @return array|mixed
+     * @return mixed
      * @throws \SDI\Exception\CircularDependencyException
      * @throws \SDI\Exception\InvalidArgumentException
      * @throws \SDI\Exception\NotFoundException
@@ -105,20 +105,37 @@ class Container implements ArrayAccess
     {
         InvalidArgumentException::assertNotEmptyString($offset, __METHOD__, 1);
 
-        if ($this->offsetExists($offset)) {
-            $value = $this->resolve($offset);
-        } elseif ($this->tagExists($offset)) {
-            $value = [];
-            foreach ($this->definitions as $id => $definition) {
-                if (isset($this->tags[$id]) && in_array($offset, $this->tags[$id], true)) {
-                    $value[] = $this->resolve($id);
-                }
-            }
-        } else {
+        if (!$this->offsetExists($offset)) {
             throw NotFoundException::forId($offset);
         }
 
-        return $value;
+        return $this->resolve($offset);
+    }
+
+    /**
+     * @param non-empty-string $tag
+     * @return non-empty-array<mixed>
+     * @throws \SDI\Exception\CircularDependencyException
+     * @throws \SDI\Exception\InvalidArgumentException
+     * @throws \SDI\Exception\NotFoundException
+     */
+    public function getByTag(string $tag): array
+    {
+        InvalidArgumentException::assertNotEmptyString($tag, __METHOD__, 1);
+
+        if (!$this->tagExists($tag)) {
+            throw NotFoundException::forId($tag);
+        }
+
+        $services = [];
+        foreach ($this->definitions as $id => $definition) {
+            if (isset($this->tags[$id]) && in_array($tag, $this->tags[$id], true)) {
+                $services[] = $this->resolve($id);
+            }
+        }
+
+        /** @var non-empty-array<mixed> */
+        return $services;
     }
 
     /**

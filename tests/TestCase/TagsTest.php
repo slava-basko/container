@@ -4,6 +4,7 @@ namespace SDI\Tests\TestCase;
 
 use PHPUnit\Framework\TestCase;
 use SDI\Container;
+use SDI\Exception\NotFoundException;
 
 class TagsTest extends TestCase
 {
@@ -24,11 +25,21 @@ class TagsTest extends TestCase
             return new \F();
         }, ['some-another-tag']);
 
-        $services = $container['some-tag'];
+        $services = $container->getByTag('some-tag');
 
         $this->assertIsArray($services);
         $this->assertCount(2, $services);
         $this->assertInstanceOf(\C::class, $services[0]);
         $this->assertInstanceOf(\D::class, $services[1]);
+    }
+
+    public function testNotDefinedTagsService()
+    {
+        $container = new Container();
+
+        $this->expectException(NotFoundException::class);
+        $this->expectExceptionMessage("The resource 'non-existed-tag' was not found.");
+
+        $container->getByTag('non-existed-tag');
     }
 }

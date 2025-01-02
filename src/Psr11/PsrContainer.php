@@ -26,7 +26,7 @@ class PsrContainer implements ContainerInterface
 
     /**
      * @param string $id
-     * @return array|mixed
+     * @return mixed
      * @throws \SDI\Psr11\Exception\PsrContainerException
      * @throws \SDI\Psr11\Exception\PsrNotFoundException
      */
