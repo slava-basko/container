@@ -5,10 +5,10 @@ For those who understand what it is and strive for simplicity.
 Zero dependencies and PHP 7.1+.
 
 ## Features
-* Simple API: Container API is as simple as regular array API.
+* Simple API: Container API is as simple as regular array.
 * Tags: Organize services using tags and fetch them in groups.
 * Shared Instances: Easily create singletons with a built-in helper.
-* Service Extenders: Extend services after they are resolved.
+* Service Extenders: Modify/Extend services after creation and before they are fully resolved.
 * Circular Dependency Detection: Automatically prevents and reports circular dependencies.
 * Autowiring: Container will automatically resolve dependencies.
 
