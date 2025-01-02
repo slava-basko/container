@@ -6,7 +6,7 @@ Zero dependencies and PHP 7.1+.
 
 ## Features
 * Simple API: Container API is as simple as regular array.
-* Tags: Organize services using tags and fetch them in groups.
+* Tags: Organize services using tags and fetch them in groups (consider them aliases).
 * Shared Instances: Easily create singletons with a built-in helper.
 * Service Extenders: Modify/Extend services after creation and before they are fully resolved.
 * Circular Dependency Detection: Automatically prevents and reports circular dependencies.
@@ -50,6 +50,35 @@ You need to use `Container::getByTag()` method to retrieve services by tags.
 
 This separate method exists since regular `get` should return a specific service or throw a `NotFoundException` 
 exception. There should not be a service or an array of services, mixed types. Only one type should be returned.
+
+#### Alias
+This container has no separate feature like `alias` for two main reasons.
+* Container has a `tags` feature, basically `alias`.
+* To keep container code as simple as possible.
+
+Use tagging functionality to achieve the same `$service = $container->getByTag('tag')[0];`.
+Don't worry about `Warning: Undefined array key 0` because container does not return an empty array. It will return 
+an array of services or throw `NotFoundException` like regular `get`.
+
+Most likely, you want to use `alias` to avoid class name exposure. For example when you want to get service 
+by requests param.
+```php
+class GameController extends Controller {
+    public function getPotion(string $potionType)
+    {
+        try {
+            $service = $this->container->getByTag($potionType)[0];
+
+            return new Response($service->getPotion());
+        } catch (NotFoundException) {
+            return new Response('Unknown potion type: ' . $potionType, 400);
+        } catch (Exception $exception) {
+            $this->logger->error($exception->getMessage());
+            return new Response('Sorry, internal error', 500);
+        }
+    }
+}
+```
 
 ### Shared Instances
 Use `Container::share()` wrapper or `Container::addShared()` method to create a shareable service. 
