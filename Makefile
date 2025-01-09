@@ -5,7 +5,7 @@ install:																		## install all dependencies for a development environm
 	composer install
 
 unit-tests:																		## run phpunit
-	./vendor/bin/phpunit -c phpunit.xml
+	XDEBUG_MODE=coverage ./vendor/bin/phpunit -c phpunit.xml
 
 code-style:																		## run phpcs
 	./vendor/bin/phpcs --basepath=. --standard=phpcs.xml

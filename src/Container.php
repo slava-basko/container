@@ -105,10 +105,6 @@ class Container implements ArrayAccess
     {
         InvalidArgumentException::assertNotEmptyString($offset, __METHOD__, 1);
 
-        if (!$this->offsetExists($offset)) {
-            throw NotFoundException::forId($offset);
-        }
-
         return $this->resolve($offset);
     }
 
@@ -259,7 +255,7 @@ class Container implements ArrayAccess
      */
     public function add(string $id, $value, array $tags = [])
     {
-        InvalidArgumentException::assertListOfStrings($tags, __METHOD__, 3);
+        InvalidArgumentException::assertListOfNotEmptyStrings($tags, __METHOD__, 3);
 
         $this[$id] = $value;
         $this->tags[$id] = $tags;
@@ -274,7 +270,7 @@ class Container implements ArrayAccess
      */
     public function addShared(string $id, callable $value, array $tags = [])
     {
-        InvalidArgumentException::assertListOfStrings($tags, __METHOD__, 3);
+        InvalidArgumentException::assertListOfNotEmptyStrings($tags, __METHOD__, 3);
 
         $this[$id] = $this::share($value);
         $this->tags[$id] = $tags;

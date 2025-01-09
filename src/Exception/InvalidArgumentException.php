@@ -4,7 +4,6 @@ namespace SDI\Exception;
 
 use function get_class;
 use function gettype;
-use function is_array;
 use function is_object;
 use function is_string;
 use function sprintf;
@@ -12,40 +11,35 @@ use function sprintf;
 class InvalidArgumentException extends ContainerException
 {
     /**
-     * @param mixed $list
-     * @param string $callee
-     * @param int $parameterPosition
-     * @return void
-     * @throws \SDI\Exception\InvalidArgumentException
-     */
-    public static function assertList($list, string $callee, int $parameterPosition)
-    {
-        if (!is_array($list)) {
-            throw new self(
-                sprintf(
-                    '%s() expects parameter %d to be array, %s given',
-                    $callee,
-                    $parameterPosition,
-                    self::getType($list)
-                )
-            );
-        }
-    }
-
-    /**
-     * @param mixed $list
+     * @param array<mixed> $list
      * @param string $callee
      * @param int $parameterPosition
      * @return void
      * @throws static
      */
-    public static function assertListOfStrings($list, string $callee, int $parameterPosition)
+    public static function assertListOfNotEmptyStrings(array $list, string $callee, int $parameterPosition)
     {
-        static::assertList($list, $callee, $parameterPosition);
-
-        /** @var array<string> $list */
         foreach ($list as $item) {
-            static::assertString($item, $callee, $parameterPosition);
+            if (!is_string($item)) {
+                throw new self(
+                    sprintf(
+                        '%s() expects parameter %d to be non-empty-array of strings, but one of element is %s',
+                        $callee,
+                        $parameterPosition,
+                        self::getType($item)
+                    )
+                );
+            }
+
+            if ($item == '') {
+                throw new self(
+                    sprintf(
+                        '%s() expects parameter %d to be non-empty-array of strings, but one of element is empty string', // phpcs:ignore
+                        $callee,
+                        $parameterPosition
+                    )
+                );
+            }
         }
     }
 

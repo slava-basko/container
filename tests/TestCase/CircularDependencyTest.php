@@ -3,9 +3,11 @@
 namespace SDI\Tests\TestCase;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Container\ContainerExceptionInterface;
 use SDI\AutowireContainer;
 use SDI\Container;
 use SDI\Exception\CircularDependencyException;
+use SDI\Psr11\PsrContainer;
 
 class CircularDependencyTest extends TestCase
 {
@@ -61,5 +63,16 @@ class CircularDependencyTest extends TestCase
         $this->expectExceptionMessage('Circular dependency detected: A -> B -> A');
 
         $a = $container[\A::class];
+    }
+
+    public function testCircularDependencyPsr()
+    {
+        $container = new AutowireContainer();
+        $psrContainer = new PsrContainer($container);
+
+        $this->expectException(ContainerExceptionInterface::class);
+        $this->expectExceptionMessage('Circular dependency detected: A -> B -> A');
+
+        $a = $psrContainer->get(\A::class);
     }
 }

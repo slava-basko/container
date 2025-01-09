@@ -8,6 +8,7 @@ use I;
 use PHPUnit\Framework\TestCase;
 use SDI\AutowireContainer;
 use SDI\Exception\ContainerException;
+use SDI\Exception\NotFoundException;
 use User;
 
 class AutowireTest extends TestCase
@@ -53,5 +54,13 @@ class AutowireTest extends TestCase
         $this->expectException(ContainerException::class);
         $this->expectExceptionMessage('The type of parameter "$someArg2" of method I::__construct() is not resolvable.');
         $i = $container[I::class];
+    }
+
+    public function testAutowireNotExist()
+    {
+        $container = new AutowireContainer();
+        $this->expectException(NotFoundException::class);
+        $this->expectExceptionMessage("The resource 'some' was not found.");
+        $container['some'];
     }
 }
