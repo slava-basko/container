@@ -17,9 +17,4 @@
         </testsuite>
     </testsuites>
 
-    <coverage>
-        <report>
-            <html outputDirectory="tests/coverage"/>
-        </report>
-    </coverage>
 </phpunit>
