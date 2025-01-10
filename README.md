@@ -48,7 +48,7 @@ $logger->warning('Oops!');
 ```
 You need to use `Container::getByTag()` method to retrieve services by tags.
 
-This separate method exists since regular `get` should return a specific service or throw a `NotFoundException` 
+This separate method exists because regular `get` should return a specific service or throw a `NotFoundException` 
 exception. There should not be a service or an array of services, mixed types. Only one type should be returned.
 
 #### Alias

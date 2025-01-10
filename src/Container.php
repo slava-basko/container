@@ -48,13 +48,14 @@ class Container implements ArrayAccess
     }
 
     /**
+     * Checking for cyclic dependency
+     *
      * @param string $id
      * @return void
      * @throws \SDI\Exception\CircularDependencyException
      */
     protected function assertCircularDependency(string $id): void
     {
-        // Checking for cyclic dependency
         if (in_array($id, $this->resolvingStack, true)) {
             $path = implode(' -> ', $this->resolvingStack);
             throw new CircularDependencyException("Circular dependency detected: $path -> $id");
@@ -62,21 +63,23 @@ class Container implements ArrayAccess
     }
 
     /**
+     * Adding the current dependency to the stack
+     *
      * @param string $id
      * @return void
      */
     protected function addIdToResolvingStack(string $id): void
     {
-        // Adding the current dependency to the stack
         $this->resolvingStack[] = $id;
     }
 
     /**
+     * Removing a dependency from the stack
+     *
      * @return void
      */
     protected function removeIdFromResolvingStack(): void
     {
-        // Removing a dependency from the stack
         array_pop($this->resolvingStack);
     }
 
@@ -119,15 +122,15 @@ class Container implements ArrayAccess
     {
         InvalidArgumentException::assertNotEmptyString($tag, __METHOD__, 1);
 
-        if (!$this->tagExists($tag)) {
-            throw NotFoundException::forId($tag);
-        }
-
         $services = [];
         foreach ($this->definitions as $id => $definition) {
             if (isset($this->tags[$id]) && in_array($tag, $this->tags[$id], true)) {
                 $services[] = $this->resolve($id);
             }
+        }
+
+        if (empty($services)) {
+            throw NotFoundException::forId($tag);
         }
 
         /** @var non-empty-array<mixed> */
@@ -175,21 +178,6 @@ class Container implements ArrayAccess
     public function offsetExists($offset): bool
     {
         return array_key_exists($offset, $this->definitions);
-    }
-
-    /**
-     * @param string $tag
-     * @return bool
-     */
-    private function tagExists(string $tag): bool
-    {
-        foreach ($this->tags as $tags) {
-            if (in_array($tag, $tags, true)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**
