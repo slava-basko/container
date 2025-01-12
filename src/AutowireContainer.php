@@ -3,10 +3,10 @@
 namespace SDI;
 
 use ReflectionClass;
-use SDI\Exception\ContainerException;
+use ReflectionNamedType;
+use SDI\Exception\AutowireException;
 
 use function class_exists;
-use function sprintf;
 
 class AutowireContainer extends Container
 {
@@ -55,22 +55,14 @@ class AutowireContainer extends Container
 
                 $parameterName = $constructorParam->getName();
                 $parameterType = $constructorParam->getType();
-                if (!$parameterType instanceof \ReflectionNamedType) {
-                    throw new ContainerException(sprintf(
-                        'The type of parameter "$%s" of method %s can\'t be determined.',
-                        $parameterName,
-                        $id . '::__construct()'
-                    ));
+                if (!$parameterType instanceof ReflectionNamedType) {
+                    throw AutowireException::createFromUnknownParamType($id, $parameterName);
                 }
 
                 $param = $parameterType->getName();
 
                 if (!class_exists($param)) {
-                    throw new ContainerException(sprintf(
-                        'The type of parameter "$%s" of method %s is not resolvable.',
-                        $parameterName,
-                        $id . '::__construct()'
-                    ));
+                    throw AutowireException::createFromUnknownClass($id, $parameterName);
                 }
 
                 if (!$this->offsetExists($param)) {

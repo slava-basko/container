@@ -10,7 +10,6 @@ use SDI\Exception\NotFoundException;
 use function array_key_exists;
 use function array_keys;
 use function array_pop;
-use function implode;
 use function in_array;
 use function is_callable;
 
@@ -57,8 +56,7 @@ class Container implements ArrayAccess
     protected function assertCircularDependency(string $id): void
     {
         if (in_array($id, $this->resolvingStack, true)) {
-            $path = implode(' -> ', $this->resolvingStack);
-            throw new CircularDependencyException("Circular dependency detected: $path -> $id");
+            throw CircularDependencyException::createFromStack($id, $this->resolvingStack);
         }
     }
 
@@ -130,7 +128,7 @@ class Container implements ArrayAccess
         }
 
         if (empty($services)) {
-            throw NotFoundException::forId($tag);
+            throw NotFoundException::createFromId($tag);
         }
 
         /** @var non-empty-array<mixed> */
@@ -147,7 +145,7 @@ class Container implements ArrayAccess
     private function resolve(string $id)
     {
         if (!$this->offsetExists($id)) {
-            throw NotFoundException::forId($id);
+            throw NotFoundException::createFromId($id);
         }
 
         $this->assertCircularDependency($id);
@@ -223,7 +221,7 @@ class Container implements ArrayAccess
      */
     public static function share(callable $value): callable
     {
-        return function ($c) use ($value) {
+        return function (Container $c) use ($value) {
             static $object;
 
             if ($object === null) {
@@ -258,10 +256,7 @@ class Container implements ArrayAccess
      */
     public function addShared(string $id, callable $value, array $tags = [])
     {
-        InvalidArgumentException::assertListOfNotEmptyStrings($tags, __METHOD__, 3);
-
-        $this[$id] = $this::share($value);
-        $this->tags[$id] = $tags;
+        $this->add($id, $this::share($value), $tags);
     }
 
     /**

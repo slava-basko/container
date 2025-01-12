@@ -35,17 +35,9 @@ class PsrContainer implements ContainerInterface
         try {
             return $this->container->offsetGet($id);
         } catch (NotFoundException $notFoundException) {
-            throw new PsrNotFoundException(
-                $notFoundException->getMessage(),
-                $notFoundException->getCode(),
-                $notFoundException
-            );
+            throw PsrNotFoundException::createFromNotFoundException($notFoundException);
         } catch (ContainerException $generalException) {
-            throw new PsrContainerException(
-                $generalException->getMessage(),
-                $generalException->getCode(),
-                $generalException
-            );
+            throw PsrContainerException::createFromContainerException($generalException);
         }
     }
 

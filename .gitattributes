@@ -3,14 +3,14 @@
 *.md text
 *.xml text
 
-# Ignore meta data
+/.github export-ignore
 /tests export-ignore
-/.gitignore export-ignore
-/.gitattributes export-ignore
 /.editorconfig export-ignore
-/phpunit.xml export-ignore
-/phpcs.xml export-ignore
-/README.md export-ignore
+/.gitattributes export-ignore
+/.gitignore export-ignore
 /Makefile export-ignore
-/run-tests.sh export-ignore
+/phpcs.xml export-ignore
 /phpstan.neon export-ignore
+/phpunit.xml export-ignore
+/README.md export-ignore
+/run-tests.sh export-ignore
