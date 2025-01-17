@@ -19,37 +19,40 @@ use function is_callable;
 class Container implements ArrayAccess
 {
     /**
-     * @var array<string, mixed>
+     * @var array<non-empty-string, mixed>
      */
     private $definitions;
 
     /**
-     * @var array<string, array<string>>
+     * @var array<non-empty-string, array<non-empty-string>>
      */
     private $tags = [];
 
     /**
-     * @var array<string>
+     * @var array<non-empty-string>
      */
     private $resolvingStack = [];
 
     /**
-     * @var array<string, callable>
+     * @var array<non-empty-string, callable>
      */
     private $extenders = [];
 
     /**
-     * @param array<string, mixed> $definitions
+     * @param array<non-empty-string, mixed> $definitions
+     * @throws \SDI\Exception\InvalidArgumentException
      */
     public function __construct(array $definitions = [])
     {
+        InvalidArgumentException::assertListOfNotEmptyStrings(array_keys($definitions), __METHOD__, 1);
+
         $this->definitions = $definitions;
     }
 
     /**
      * Checking for cyclic dependency
      *
-     * @param string $id
+     * @param non-empty-string $id
      * @return void
      * @throws \SDI\Exception\CircularDependencyException
      */
@@ -63,7 +66,7 @@ class Container implements ArrayAccess
     /**
      * Adding the current dependency to the stack
      *
-     * @param string $id
+     * @param non-empty-string $id
      * @return void
      */
     protected function addIdToResolvingStack(string $id): void
@@ -82,61 +85,7 @@ class Container implements ArrayAccess
     }
 
     /**
-     * @param string $offset
-     * @param mixed $value
-     * @return void
-     * @throws \SDI\Exception\InvalidArgumentException
-     */
-    public function offsetSet($offset, $value): void
-    {
-        InvalidArgumentException::assertNotEmptyString($offset, __METHOD__, 1);
-
-        $this->definitions[$offset] = $value;
-    }
-
-    /**
-     * @param $offset
-     * @return mixed
-     * @throws \SDI\Exception\CircularDependencyException
-     * @throws \SDI\Exception\InvalidArgumentException
-     * @throws \SDI\Exception\NotFoundException
-     */
-    #[\ReturnTypeWillChange]
-    public function offsetGet($offset)
-    {
-        InvalidArgumentException::assertNotEmptyString($offset, __METHOD__, 1);
-
-        return $this->resolve($offset);
-    }
-
-    /**
-     * @param non-empty-string $tag
-     * @return non-empty-array<mixed>
-     * @throws \SDI\Exception\CircularDependencyException
-     * @throws \SDI\Exception\InvalidArgumentException
-     * @throws \SDI\Exception\NotFoundException
-     */
-    public function getByTag(string $tag): array
-    {
-        InvalidArgumentException::assertNotEmptyString($tag, __METHOD__, 1);
-
-        $services = [];
-        foreach ($this->definitions as $id => $definition) {
-            if (isset($this->tags[$id]) && in_array($tag, $this->tags[$id], true)) {
-                $services[] = $this->resolve($id);
-            }
-        }
-
-        if (empty($services)) {
-            throw NotFoundException::createFromId($tag);
-        }
-
-        /** @var non-empty-array<mixed> */
-        return $services;
-    }
-
-    /**
-     * @param string $id
+     * @param non-empty-string $id
      * @return mixed
      * @throws \SDI\Exception\CircularDependencyException
      * @throws \SDI\Exception\NotFoundException
@@ -159,7 +108,7 @@ class Container implements ArrayAccess
         }
 
         foreach ($this->extenders as $extenderId => $extender) {
-            if ($value instanceof $extenderId) {
+            if ($id === $extenderId || $value instanceof $extenderId) {
                 $value = $extender($value, $this);
             }
         }
@@ -170,7 +119,77 @@ class Container implements ArrayAccess
     }
 
     /**
-     * @param $offset
+     * @param non-empty-string $offset
+     * @param mixed $value
+     * @return void
+     * @throws \SDI\Exception\InvalidArgumentException
+     */
+    public function offsetSet($offset, $value): void
+    {
+        InvalidArgumentException::assertNotEmptyString($offset, __METHOD__, 1);
+
+        $this->definitions[$offset] = $value;
+    }
+
+    /**
+     * @param non-empty-string $offset
+     * @return mixed
+     * @throws \SDI\Exception\CircularDependencyException
+     * @throws \SDI\Exception\InvalidArgumentException
+     * @throws \SDI\Exception\NotFoundException
+     */
+    #[\ReturnTypeWillChange]
+    public function offsetGet($offset)
+    {
+        InvalidArgumentException::assertNotEmptyString($offset, __METHOD__, 1);
+
+        /** @var non-empty-string $offset */
+        return $this->resolve($offset);
+    }
+
+    /**
+     * Alias for Container::offsetGet()
+     *
+     * @param non-empty-string $id
+     * @return mixed
+     * @throws \SDI\Exception\CircularDependencyException
+     * @throws \SDI\Exception\InvalidArgumentException
+     * @throws \SDI\Exception\NotFoundException
+     */
+    public function get(string $id)
+    {
+        return $this->offsetGet($id);
+    }
+
+    /**
+     * @param non-empty-string $tag
+     * @return non-empty-array<mixed>
+     * @throws \SDI\Exception\CircularDependencyException
+     * @throws \SDI\Exception\InvalidArgumentException
+     * @throws \SDI\Exception\NotFoundException
+     */
+    public function getByTag(string $tag): array
+    {
+        InvalidArgumentException::assertNotEmptyString($tag, __METHOD__, 1);
+
+        $services = [];
+        foreach ($this->definitions as $id => $definition) {
+            if (isset($this->tags[$id]) && in_array($tag, $this->tags[$id], true)) {
+                /** @var non-empty-string $id */
+                $services[] = $this->resolve($id);
+            }
+        }
+
+        if (empty($services)) {
+            throw NotFoundException::createFromId($tag);
+        }
+
+        /** @var non-empty-array<mixed> */
+        return $services;
+    }
+
+    /**
+     * @param non-empty-string $offset
      * @return bool
      */
     public function offsetExists($offset): bool
@@ -179,7 +198,18 @@ class Container implements ArrayAccess
     }
 
     /**
-     * @param $offset
+     * Alias for Container::offsetExists()
+     *
+     * @param non-empty-string $id
+     * @return bool
+     */
+    public function has(string $id): bool
+    {
+        return $this->offsetExists($id);
+    }
+
+    /**
+     * @param non-empty-string $offset
      * @return void
      * @throws \SDI\Exception\InvalidArgumentException
      */
@@ -193,7 +223,7 @@ class Container implements ArrayAccess
     /**
      * Returns all defined value names.
      *
-     * @return array<string>
+     * @return array<non-empty-string>
      */
     public function keys(): array
     {
@@ -233,14 +263,15 @@ class Container implements ArrayAccess
     }
 
     /**
-     * @param string $id
+     * @param non-empty-string $id
      * @param mixed $value
-     * @param array<string> $tags
+     * @param array<non-empty-string> $tags
      * @return void
      * @throws \SDI\Exception\InvalidArgumentException
      */
     public function add(string $id, $value, array $tags = [])
     {
+        InvalidArgumentException::assertNotEmptyString($id, __METHOD__, 1);
         InvalidArgumentException::assertListOfNotEmptyStrings($tags, __METHOD__, 3);
 
         $this[$id] = $value;
@@ -248,9 +279,9 @@ class Container implements ArrayAccess
     }
 
     /**
-     * @param string $id
+     * @param non-empty-string $id
      * @param callable $value
-     * @param array<string> $tags
+     * @param array<non-empty-string> $tags
      * @return void
      * @throws \SDI\Exception\InvalidArgumentException
      */
@@ -260,12 +291,15 @@ class Container implements ArrayAccess
     }
 
     /**
-     * @param string $id
+     * @param non-empty-string $id
      * @param callable $callable
      * @return void
+     * @throws \SDI\Exception\InvalidArgumentException
      */
     public function extend(string $id, callable $callable)
     {
+        InvalidArgumentException::assertNotEmptyString($id, __METHOD__, 1);
+
         $this->extenders[$id] = $callable;
     }
 }

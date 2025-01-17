@@ -65,3 +65,22 @@ class BaseRepository {
 }
 
 class SomeRepository extends BaseRepository {}
+
+class DbConnection {
+
+    /**
+     * @var string
+     */
+    public $connectionString;
+
+    public function __construct(string $connectionString)
+    {
+        $this->connectionString = $connectionString;
+    }
+
+    public function executeQuery(string $query): array
+    {
+        $conn = $this->connectionString;
+        return [$conn];
+    }
+}

@@ -27,7 +27,20 @@ class BasicTest extends TestCase
         $container['k2'] = 123;
 
         $this->assertEquals('v1', $container['k1']);
-        $this->assertEquals(123, $container['k2']);
+        $this->assertEquals(123, $container->get('k2'));
+    }
+
+    public function testIsset()
+    {
+        $container = new Container();
+        $container['k1'] = 'v1';
+        $container['k2'] = 123;
+
+        $this->assertTrue(isset($container['k1']));
+        $this->assertTrue($container->has('k2'));
+
+        $this->assertFalse(isset($container['k3']));
+        $this->assertFalse($container->has('k4'));
     }
 
     public function testService()

@@ -11,8 +11,8 @@ use function class_exists;
 class AutowireContainer extends Container
 {
     /**
-     * @param string $offset
-     * @return array|mixed
+     * @param non-empty-string $offset
+     * @return mixed
      * @throws \SDI\Exception\CircularDependencyException
      * @throws \SDI\Exception\ContainerException
      * @throws \SDI\Exception\InvalidArgumentException
@@ -28,7 +28,7 @@ class AutowireContainer extends Container
     }
 
     /**
-     * @param string $id
+     * @param non-empty-string $id
      * @return void
      * @throws \SDI\Exception\CircularDependencyException
      * @throws \SDI\Exception\ContainerException

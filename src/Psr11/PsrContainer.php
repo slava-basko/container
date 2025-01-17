@@ -25,7 +25,7 @@ class PsrContainer implements ContainerInterface
     }
 
     /**
-     * @param string $id
+     * @param non-empty-string $id
      * @return mixed
      * @throws \SDI\Psr11\Exception\PsrContainerException
      * @throws \SDI\Psr11\Exception\PsrNotFoundException
@@ -42,7 +42,7 @@ class PsrContainer implements ContainerInterface
     }
 
     /**
-     * @param string $id
+     * @param non-empty-string $id
      * @return bool
      */
     public function has(string $id): bool
