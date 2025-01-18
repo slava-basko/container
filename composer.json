@@ -2,7 +2,7 @@
   "name": "slava-basko/container",
   "type": "library",
   "description": "Dependency injection container.",
-  "keywords": ["container", "dependency", "injection", "di", "service"],
+  "keywords": ["container", "dependency", "injection", "di", "service", "ioc"],
   "authors": [
     {
       "name": "Slava Basko",
