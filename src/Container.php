@@ -6,6 +6,7 @@ use ArrayAccess;
 use SDI\Exception\CircularDependencyException;
 use SDI\Exception\InvalidArgumentException;
 use SDI\Exception\NotFoundException;
+use SDI\Exception\RewriteAttemptException;
 
 use function array_key_exists;
 use function array_keys;
@@ -18,6 +19,11 @@ use function is_callable;
  */
 class Container implements ArrayAccess
 {
+    /**
+     * @var bool
+     */
+    private $nonRewritable = true;
+
     /**
      * @var array<non-empty-string, mixed>
      */
@@ -47,6 +53,15 @@ class Container implements ArrayAccess
         InvalidArgumentException::assertListOfNotEmptyStrings(array_keys($definitions), __METHOD__, 1);
 
         $this->definitions = $definitions;
+    }
+
+    /**
+     * @param bool $rewritable
+     * @return void
+     */
+    public function rewriteProtection(bool $rewritable)
+    {
+        $this->nonRewritable = $rewritable;
     }
 
     /**
@@ -123,10 +138,15 @@ class Container implements ArrayAccess
      * @param mixed $value
      * @return void
      * @throws \SDI\Exception\InvalidArgumentException
+     * @throws \SDI\Exception\RewriteAttemptException
      */
     public function offsetSet($offset, $value): void
     {
         InvalidArgumentException::assertNotEmptyString($offset, __METHOD__, 1);
+
+        if ($this->nonRewritable === true && $this->offsetExists($offset)) {
+            throw RewriteAttemptException::createFromId($offset);
+        }
 
         $this->definitions[$offset] = $value;
     }

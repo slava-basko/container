@@ -3,8 +3,11 @@
 namespace SDI\Tests\TestCase;
 
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\TestStatus\Warning;
 use SDI\Container;
+use SDI\Exception\ContainerException;
 use SDI\Exception\NotFoundException;
+use SDI\Exception\RewriteAttemptException;
 
 class BasicTest extends TestCase
 {
@@ -153,5 +156,23 @@ class BasicTest extends TestCase
         unset($container['key'], $container['service']);
         $this->assertFalse(isset($container['key']));
         $this->assertFalse(isset($container['service']));
+    }
+
+    public function testOverwriteFail()
+    {
+        $container = new Container();
+        $container['k'] = 'v1';
+        $this->expectException(RewriteAttemptException::class);
+        $this->expectExceptionMessage("The resource 'k' already defined.");
+        $container['k'] = 'v2';
+    }
+
+    public function testOverwriteSuccess()
+    {
+        $container = new Container();
+        $container->rewriteProtection(false);
+        $container['k'] = 'v1';
+        $container['k'] = 'v2';
+        $this->assertEquals('v2', $container['k']);
     }
 }
