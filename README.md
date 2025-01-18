@@ -12,6 +12,7 @@ Zero dependencies and PHP 7.1+.
 * Circular Dependency Detection: Automatically prevents and reports circular dependencies.
 * Autowiring: Container will automatically resolve dependencies.
 * Rewrite Protection: Reports about accidental service rewrite.
+* Service Providers: Package your services into a provider for better organization.
 
 ### Simple API
 Consider `Container` as a regular array.
@@ -156,6 +157,25 @@ $container['k'] = 'v1';
 $container['k'] = 'v2'; // RewriteAttemptException: The resource 'k' already defined.
 ```
 You can disable this protection by calling `$container->rewriteProtection(false)` method.
+
+### Service Providers
+Providers give you the benefit of organizing your definitions.
+```php
+use SDI\Container;
+use SDI\ProviderInterface;
+
+class SomeServiceProvider implements ProviderInterface {
+    public function register(Container $container): void
+    {
+        $container['some-service'] = fn () => new SomeService();
+        // other definitions
+    }
+}
+```
+Then, add the provider to the container.
+```php
+$container->addProvider(new SomeServiceProvider());
+```
 
 ## PSR-11
 Install `psr/container` package first.

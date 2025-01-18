@@ -10,8 +10,7 @@ class ProviderTest extends TestCase
     public function testProvider()
     {
         $container = new Container();
-        $provider = new \SomeServiceProvider();
-        $container->addProvider($provider);
+        $container->addProvider(new \SomeServiceProvider());
 
         $this->assertEquals(123, $container['from-service-provider']);
     }
