@@ -11,6 +11,7 @@ Zero dependencies and PHP 7.1+.
 * Service Extenders: Modify/Extend services after creation and before they are fully resolved.
 * Circular Dependency Detection: Automatically prevents and reports circular dependencies.
 * Autowiring: Container will automatically resolve dependencies.
+* Rewrite Protection: Reports about accidental service rewrite.
 
 ### Simple API
 Consider `Container` as a regular array.
@@ -146,6 +147,15 @@ $container = new AutowireContainer();
 $filesystem = $container[Filesystem::class]
 // $filesystem will be an instance of Filesystem that contains FilesystemAdapter inside
 ```
+
+### Rewrite Protection
+Container will throw an exception if you accidentally rewrite the service definition.
+```php
+$container = new Container();
+$container['k'] = 'v1';
+$container['k'] = 'v2'; // RewriteAttemptException: The resource 'k' already defined.
+```
+You can disable this protection by calling `$container->rewriteProtection(false)` method.
 
 ## PSR-11
 Install `psr/container` package first.
