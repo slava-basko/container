@@ -1,5 +1,7 @@
 <?php
 
+use _PHPStan_2f712479f\Symfony\Contracts\Service\ServiceProviderInterface;
+
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../tests/psr.php';
 
@@ -82,5 +84,12 @@ class DbConnection {
     {
         $conn = $this->connectionString;
         return [$conn];
+    }
+}
+
+class SomeServiceProvider implements \SDI\ProviderInterface {
+    public function register(\SDI\Container $container): void
+    {
+        $container['from-service-provider'] = 123;
     }
 }

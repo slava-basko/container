@@ -302,4 +302,13 @@ class Container implements ArrayAccess
 
         $this->extenders[$id] = $callable;
     }
+
+    /**
+     * @param \SDI\ProviderInterface $provider
+     * @return void
+     */
+    public function addProvider(ProviderInterface $provider)
+    {
+        $provider->register($this);
+    }
 }
