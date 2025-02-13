@@ -13,5 +13,6 @@ class ProviderTest extends TestCase
         $container->addProvider(new \SomeServiceProvider());
 
         $this->assertEquals(123, $container['from-service-provider']);
+        $this->assertEquals(456, $container['from-service-provider-2']);
     }
 }

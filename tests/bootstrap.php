@@ -91,5 +91,11 @@ class SomeServiceProvider implements \SDI\ProviderInterface {
     public function register(\SDI\Container $container): void
     {
         $container['from-service-provider'] = 123;
+        $container['from-service-provider-2'] = [$this, 'registerService2'];
+    }
+
+    public static function registerService2(\SDI\Container $container): int
+    {
+        return 456;
     }
 }

@@ -107,4 +107,22 @@ class ExtendTest extends TestCase
         $this->assertInstanceOf(\SomeRepository::class, $repository);
         $this->assertInstanceOf(\Logger::class, $repository->logger);
     }
+
+    public function testExtendMultiple()
+    {
+        $container = new Container();
+        $container['arr'] = [];
+        $container->extend('arr', function (array $arr) {
+            $arr[] = 123;
+
+            return $arr;
+        });
+        $container->extend('arr', function (array $arr) {
+            $arr[] = 456;
+
+            return $arr;
+        });
+
+        $this->assertEquals([123, 456], $container['arr']);
+    }
 }

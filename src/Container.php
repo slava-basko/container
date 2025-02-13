@@ -40,7 +40,7 @@ class Container implements ArrayAccess
     private $resolvingStack = [];
 
     /**
-     * @var array<non-empty-string, callable>
+     * @var array<non-empty-string, array<callable>>
      */
     private $extenders = [];
 
@@ -115,16 +115,17 @@ class Container implements ArrayAccess
         $this->assertCircularDependency($id);
         $this->addIdToResolvingStack($id);
 
-        // Resolve
         if (is_callable($this->definitions[$id])) {
             $value = $this->definitions[$id]($this);
         } else {
             $value = $this->definitions[$id];
         }
 
-        foreach ($this->extenders as $extenderId => $extender) {
-            if ($id === $extenderId || $value instanceof $extenderId) {
-                $value = $extender($value, $this);
+        foreach ($this->extenders as $extenderId => $extenders) {
+            foreach ($extenders as $extender) {
+                if ($id === $extenderId || $value instanceof $extenderId) {
+                    $value = $extender($value, $this);
+                }
             }
         }
 
@@ -163,7 +164,6 @@ class Container implements ArrayAccess
     {
         InvalidArgumentException::assertNotEmptyString($offset, __METHOD__, 1);
 
-        /** @var non-empty-string $offset */
         return $this->resolve($offset);
     }
 
@@ -195,7 +195,6 @@ class Container implements ArrayAccess
         $services = [];
         foreach ($this->definitions as $id => $definition) {
             if (isset($this->tags[$id]) && in_array($tag, $this->tags[$id], true)) {
-                /** @var non-empty-string $id */
                 $services[] = $this->resolve($id);
             }
         }
@@ -204,7 +203,6 @@ class Container implements ArrayAccess
             throw NotFoundException::createFromId($tag);
         }
 
-        /** @var non-empty-array<mixed> */
         return $services;
     }
 
@@ -320,7 +318,7 @@ class Container implements ArrayAccess
     {
         InvalidArgumentException::assertNotEmptyString($id, __METHOD__, 1);
 
-        $this->extenders[$id] = $callable;
+        $this->extenders[$id][] = $callable;
     }
 
     /**
