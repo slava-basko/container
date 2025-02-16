@@ -3,7 +3,7 @@
 namespace SDI\Psr11;
 
 use Psr\Container\ContainerInterface;
-use SDI\Container;
+use SDI\ContainerInterface as InternalContainer;
 use SDI\Exception\ContainerException;
 use SDI\Exception\NotFoundException;
 use SDI\Psr11\Exception\PsrContainerException;
@@ -12,14 +12,14 @@ use SDI\Psr11\Exception\PsrNotFoundException;
 class PsrContainer implements ContainerInterface
 {
     /**
-     * @var \SDI\Container
+     * @var InternalContainer
      */
     private $container;
 
     /**
-     * @param \SDI\Container $container
+     * @param InternalContainer $container
      */
-    public function __construct(Container $container)
+    public function __construct(InternalContainer $container)
     {
         $this->container = $container;
     }
@@ -33,7 +33,7 @@ class PsrContainer implements ContainerInterface
     public function get(string $id)
     {
         try {
-            return $this->container->offsetGet($id);
+            return $this->container->get($id);
         } catch (NotFoundException $notFoundException) {
             throw PsrNotFoundException::createFromNotFoundException($notFoundException);
         } catch (ContainerException $generalException) {
@@ -47,6 +47,6 @@ class PsrContainer implements ContainerInterface
      */
     public function has(string $id): bool
     {
-        return $this->container->offsetExists($id);
+        return $this->container->has($id);
     }
 }

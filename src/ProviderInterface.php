@@ -4,5 +4,5 @@ namespace SDI;
 
 interface ProviderInterface
 {
-    public function register(Container $container): void;
+    public function register(ContainerInterface $container): void;
 }

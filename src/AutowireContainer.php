@@ -11,12 +11,8 @@ use function class_exists;
 class AutowireContainer extends Container
 {
     /**
-     * @param non-empty-string $offset
-     * @return mixed
-     * @throws \SDI\Exception\CircularDependencyException
+     * @inheritdoc
      * @throws \SDI\Exception\ContainerException
-     * @throws \SDI\Exception\InvalidArgumentException
-     * @throws \SDI\Exception\NotFoundException
      */
     public function offsetGet($offset)
     {
@@ -25,6 +21,19 @@ class AutowireContainer extends Container
         }
 
         return parent::offsetGet($offset);
+    }
+
+    /**
+     * @inheritdoc
+     * @throws \SDI\Exception\ContainerException
+     */
+    public function get(string $id)
+    {
+        if (!$this->has($id)) {
+            $this->define($id);
+        }
+
+        return parent::get($id);
     }
 
     /**
@@ -65,7 +74,7 @@ class AutowireContainer extends Container
                     throw AutowireException::createFromUnknownClass($id, $parameterName);
                 }
 
-                if (!$this->offsetExists($param)) {
+                if (!$this->has($param)) {
                     $this->define($param);
                 }
 
@@ -73,13 +82,13 @@ class AutowireContainer extends Container
             }
         }
 
-        $this[$id] = function (Container $c) use ($id, $constructorArgs) {
+        $this->add($id, function (ContainerInterface $c) use ($id, $constructorArgs) {
             $args = [];
             foreach ($constructorArgs as $constructorArg) {
-                $args[] = $c[$constructorArg];
+                $args[] = $c->get($constructorArg);
             }
             return new $id(...$args);
-        };
+        });
 
         $this->removeIdFromResolvingStack();
     }

@@ -34,7 +34,7 @@ class AutowireTest extends TestCase
     public function testAutowireShareable()
     {
         $container = new AutowireContainer();
-        $container[User::class] = $container->share(function ($c) {
+        $container->addShared(User::class, function ($c) {
             return new User(true);
         });
         $this->assertEquals($container[G::class]->client->id, $container[G::class]->client->id);

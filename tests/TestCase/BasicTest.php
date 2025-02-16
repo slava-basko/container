@@ -71,7 +71,7 @@ class BasicTest extends TestCase
     {
         $container = new Container();
         $container['id'] = 99;
-        $container['user'] = Container::share(function ($c) {
+        $container->addShared('user', function ($c) {
             $user = new \User();
             $user->id = $c['id'];
             return $user;

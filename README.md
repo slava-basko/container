@@ -13,6 +13,7 @@ Zero dependencies and PHP 7.1+.
 * Autowiring: Container will automatically resolve dependencies.
 * Rewrite Protection: Reports about accidental service rewrite.
 * Service Providers: Package your services into a provider for better organization.
+* Graph: Generate DOT script to visualize dependencies (Graphviz).
 
 ### Simple API
 Consider `Container` as a regular array.
@@ -176,6 +177,17 @@ Then, add the provider to the container.
 ```php
 $container->addProvider(new SomeServiceProvider());
 ```
+
+### Graph
+Using the DOT language, build a graph (as in nodes and edges, not as in bar charts).
+```php
+$container = new Container();
+// Add services and define dependencies
+
+$graph = new Graphviz($container);
+$graph->build();
+```
+For example, you can visualize the output of `Graphviz::build()` with https://dreampuf.github.io/GraphvizOnline.
 
 ## PSR-11
 Install `psr/container` package first.

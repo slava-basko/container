@@ -59,10 +59,30 @@ class ExtendTest extends TestCase
         $this->assertEquals(123, $updatedUser->id);
     }
 
-    public function testExtendShared()
+    public function testExtendOnShared()
     {
         $container = new Container();
-        $container['user'] = Container::share(function ($c) {
+        $container->addShared('user', function ($c) {
+            return new \User();
+        });
+        $container->extend('user', function (\User $user) {
+            $user->id = 123;
+
+            return $user;
+        });
+        $user = $container['user'];
+        $this->assertInstanceOf('\User', $user);
+        $this->assertEquals(123, $user->id);
+
+        $user2 = $container['user'];
+
+        $this->assertSame($user, $user2);
+    }
+
+    public function testExtendNoEffectOnSharedAfterResolve()
+    {
+        $container = new Container();
+        $container->addShared('user', function ($c) {
             return new \User();
         });
 
@@ -76,7 +96,7 @@ class ExtendTest extends TestCase
             return $user;
         });
         $updatedUser = $container['user'];
-        $this->assertEquals(123, $updatedUser->id);
+        $this->assertEquals(null, $updatedUser->id);
 
         $this->assertSame($user, $updatedUser);
     }

@@ -88,14 +88,88 @@ class DbConnection {
 }
 
 class SomeServiceProvider implements \SDI\ProviderInterface {
-    public function register(\SDI\Container $container): void
+    public function register(\SDI\ContainerInterface $container): void
     {
         $container['from-service-provider'] = 123;
         $container['from-service-provider-2'] = [$this, 'registerService2'];
     }
 
-    public static function registerService2(\SDI\Container $container): int
+    public static function registerService2(\SDI\ContainerInterface $container): int
     {
         return 456;
     }
 }
+
+class GMySqlClient {
+    public $dsnString;
+
+    public function __construct(string $dsnString){
+        $this->dsnString = $dsnString;
+    }}
+class GQueryBuilder {
+    public $mysqlClient;
+
+    public function __construct(GMySqlClient $mysqlClient){
+        $this->mysqlClient = $mysqlClient;
+    }}
+class GRedisClient {
+    public $dsnString;
+
+    public function __construct(string $dsnString){
+        $this->dsnString = $dsnString;
+    }}
+class GUsersRepository {
+    public $mysqlClient;
+
+    public function __construct(GMySqlClient $mysqlClient){
+        $this->mysqlClient = $mysqlClient;
+    }}
+class GPostsRepository {
+    public $mysqlClient;
+
+    public function __construct(GMySqlClient $mysqlClient){
+        $this->mysqlClient = $mysqlClient;
+    }}
+class GSessionsHandler {
+    public $redisClient;
+    public $logger;
+
+    public function __construct(GLogger $logger, GRedisClient $redisClient){
+        $this->logger = $logger;
+        $this->redisClient = $redisClient;
+    }}
+class GPostsService {
+    public $logger;
+    public $usersRepository;
+    public $postsRepository;
+
+    public function __construct(GLogger $logger, GUsersRepository $usersRepository, GPostsRepository $postsRepository){
+        $this->postsRepository = $postsRepository;
+        $this->usersRepository = $usersRepository;
+        $this->logger = $logger;
+    }}
+class GUsersExportService  {
+    public $usersRepository;
+    /**
+     * @var string
+     */
+    private $exportFilePath;
+
+    public function __construct(GUsersRepository $usersRepository, string $exportFilePath){
+        $this->usersRepository = $usersRepository;
+        $this->exportFilePath = $exportFilePath;
+    }}
+class GExportBuilder {}
+class GLoggerFileHandler {
+    public $filePath;
+
+    public function __construct(string $filePath){
+        $this->filePath = $filePath;
+    }}
+class GLoggerDbHandler {
+    public $mysqlClient;
+
+    public function __construct(GMySqlClient $mysqlClient){
+        $this->mysqlClient = $mysqlClient;
+    }}
+class GLogger {public function __construct(array $handlers){}}
