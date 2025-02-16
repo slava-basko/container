@@ -189,6 +189,12 @@ $graph->build();
 ```
 For example, you can visualize the output of `Graphviz::build()` with https://dreampuf.github.io/GraphvizOnline.
 
+Graph element explanation:
+* Oval — parameter
+* Solid Rectangle — service
+* Dashed Rectangle — shared service
+* Parallelogram — non-existent service or param
+
 ## PSR-11
 Install `psr/container` package first.
 ```bash
