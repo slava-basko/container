@@ -16,11 +16,6 @@ use function is_callable;
 abstract class AbstractContainer implements ContainerInterface
 {
     /**
-     * @var bool
-     */
-    protected $nonRewritable = true;
-
-    /**
      * @var array<non-empty-string, mixed>
      */
     protected $definitions = [];
@@ -49,15 +44,6 @@ abstract class AbstractContainer implements ContainerInterface
      * @var array<non-empty-string, array<callable>>
      */
     protected $extenders = [];
-
-    /**
-     * @param bool $rewritable
-     * @return void
-     */
-    public function rewriteProtection(bool $rewritable)
-    {
-        $this->nonRewritable = $rewritable;
-    }
 
     /**
      * Checking for cyclic dependency
@@ -175,7 +161,7 @@ abstract class AbstractContainer implements ContainerInterface
     {
         InvalidArgumentException::assertNotEmptyString($id, __METHOD__, 1);
 
-        if ($this->nonRewritable === true && $this->has($id)) {
+        if ($this->has($id)) {
             throw RewriteAttemptException::createFromId($id);
         }
 

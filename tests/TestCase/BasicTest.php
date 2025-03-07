@@ -149,13 +149,10 @@ class BasicTest extends TestCase
     {
         $container = new Container();
         $container['key'] = 'value';
-        $container['service'] = function () {
-            return new \User();
-        };
 
-        unset($container['key'], $container['service']);
-        $this->assertFalse(isset($container['key']));
-        $this->assertFalse(isset($container['service']));
+        $this->expectException(ContainerException::class);
+        $this->expectExceptionMessage('Unset not allowed');
+        unset($container['key']);
     }
 
     public function testOverwriteFail()
@@ -163,16 +160,7 @@ class BasicTest extends TestCase
         $container = new Container();
         $container['k'] = 'v1';
         $this->expectException(RewriteAttemptException::class);
-        $this->expectExceptionMessage("The resource 'k' already defined.");
+        $this->expectExceptionMessage("The resource 'k' already defined");
         $container['k'] = 'v2';
-    }
-
-    public function testOverwriteSuccess()
-    {
-        $container = new Container();
-        $container->rewriteProtection(false);
-        $container['k'] = 'v1';
-        $container['k'] = 'v2';
-        $this->assertEquals('v2', $container['k']);
     }
 }

@@ -28,9 +28,10 @@ $cache = $container[Cache::class];
 
 $cache->get('currency-rates');
 ```
+Easier than ever for simple script/app.
 
 ### Tags
-You need to use the `Container::add()` method to use tags.
+Things get a bit more complicated when you need tags. Use the `Container::add()` method to setup tags.
 ```php
 $container = new Container();
 
@@ -49,10 +50,12 @@ $logger = $container[Logger::class];
 
 $logger->warning('Oops!');
 ```
-You need to use `Container::getByTag()` method to retrieve services by tags.
-
+Use the `Container::getByTag()` method to retrieve services by tags.
 This separate method exists because regular `get` should return a specific service or throw a `NotFoundException` 
-exception. There should not be a service or an array of services, mixed types. Only one type should be returned.
+exception.
+
+Clear and strict separation: `Container::get()` returns a service or throws `NotFoundException`, 
+and the `Container::getByTag()` returns an array of services of throws `NotFoundException`.
 
 #### Alias
 This container has no separate feature like `alias` for two main reasons.
@@ -70,9 +73,9 @@ class GameController extends Controller {
     public function getPotion(string $potionType)
     {
         try {
-            $service = $this->container->getByTag($potionType)[0];
+            $potionService = $this->container->getByTag($potionType)[0];
 
-            return new Response($service->getPotion());
+            return new Response($potionService->getPotion());
         } catch (NotFoundException) {
             return new Response('Unknown potion type: ' . $potionType, 400);
         } catch (Exception $exception) {
@@ -84,21 +87,21 @@ class GameController extends Controller {
 ```
 
 ### Shared Instances
-Use `Container::share()` wrapper or `Container::addShared()` method to create a shareable service. 
+Use `Container::addShared()` method to create a shareable service. 
 Container will return the same instance each time.
 ```php
 $container = new Container();
 
-$container[MySQLConnection::class] = Container::share(fn (Container $c) => new MySQLConnection());
+$container->addShared(MySQLConnection::class, fn (Container $c) => new MySQLConnection());
 
-$conn1 = $container[MySQLConnection::class];
-$conn2 = $container[MySQLConnection::class];
+$conn1 = $container->get(MySQLConnection::class);
+$conn2 = $container->get(MySQLConnection::class);
 
 assert(spl_object_hash($conn1) === spl_object_hash($conn2));
 ```
 
 ### Service Extenders
-Use `Container::extend()` to modify services by a common parent, for example.
+Use `Container::extend()` to modify services by a common parent.
 ```php
 $container = new Container();
 $container[\Logger::class] = fn () => new \Logger();
@@ -110,7 +113,7 @@ $container->extend(\BaseRepository::class, function (\BaseRepository $repository
 });
 
 $repository = $container[\SomeRepository::class];
-// From now on, every repository returned by the container and which `extends` BaseRepository has a Logger inside it.
+// From now on, every repository returned by the container and which `extends` BaseRepository has a Logger inside.
 ```
 
 ### Circular Dependency Detection
@@ -157,25 +160,30 @@ $container = new Container();
 $container['k'] = 'v1';
 $container['k'] = 'v2'; // RewriteAttemptException: The resource 'k' already defined.
 ```
-You can disable this protection by calling `$container->rewriteProtection(false)` method.
+> _But what if I need to overwrite definition!_
+
+Shift your mindset from "overwrite" to "setup based on X condition" and do it in the user-land code.
+```php
+$container = new Container();
+$container['mysql-dsn'] = getenv('ENVIRONMENT') === 'prod' ? 'mysql://production-dsn' : 'mysql://development-dsn';
+```
+This approach, together with `Rewrite Protection,` will keep your code strict and more understandable.
+There will be no hidden overwrites.
 
 ### Service Providers
 Providers give you the benefit of organizing your definitions.
 ```php
-use SDI\Container;
-use SDI\ProviderInterface;
-
-class SomeServiceProvider implements ProviderInterface {
+class LoggerServiceProvider implements ProviderInterface {
     public function register(Container $container): void
     {
-        $container['some-service'] = fn () => new SomeService();
-        // other definitions
+        // Define your handlers, formatters, processors, and logger itself.
+        // All Logger-related things are in one place.
     }
 }
 ```
 Then, add the provider to the container.
 ```php
-$container->addProvider(new SomeServiceProvider());
+$container->addProvider(new LoggerServiceProvider());
 ```
 
 ### Graph
@@ -194,6 +202,8 @@ Graph element explanation:
 * Solid Rectangle — service
 * Dashed Rectangle — shared service
 * Parallelogram — non-existent service or param
+
+**Note:** Graph not working with `AutowireContainer`.
 
 ## PSR-11
 Install `psr/container` package first.

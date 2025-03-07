@@ -3,6 +3,7 @@
 namespace SDI;
 
 use ArrayAccess;
+use SDI\Exception\ContainerException;
 use SDI\Exception\InvalidArgumentException;
 
 /**
@@ -62,12 +63,10 @@ class Container extends AbstractContainer implements ArrayAccess
     /**
      * @param non-empty-string $offset
      * @return void
-     * @throws \SDI\Exception\InvalidArgumentException
+     * @throws \SDI\Exception\ContainerException
      */
     public function offsetUnset($offset): void
     {
-        InvalidArgumentException::assertNotEmptyString($offset, __METHOD__, 1);
-
-        unset($this->definitions[$offset], $this->tags[$offset], $this->extenders[$offset]);
+        throw ContainerException::createOffsetUnsetNotAllowed();
     }
 }

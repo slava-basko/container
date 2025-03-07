@@ -10,6 +10,6 @@ class RewriteAttemptException extends ContainerException
      */
     public static function createFromId(string $id): RewriteAttemptException
     {
-        return new self("The resource '$id' already defined.");
+        return new self("The resource '$id' already defined");
     }
 }
