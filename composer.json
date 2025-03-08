@@ -2,6 +2,7 @@
   "name": "slava-basko/container",
   "type": "library",
   "description": "Dependency injection container.",
+  "license": "MIT",
   "keywords": ["container", "dependency", "injection", "di", "service", "ioc"],
   "authors": [
     {
