@@ -187,7 +187,8 @@ $container->addProvider(new LoggerServiceProvider());
 ```
 
 ### Graph
-Using the DOT language, build a graph (as in nodes and edges, not as in bar charts).
+Using the DOT language, build a graph (as in nodes and edges, not as in bar charts). **Note:** Graph not working 
+with `AutowireContainer`.
 ```php
 $container = new Container();
 // Add services and define dependencies
@@ -203,7 +204,7 @@ Graph element explanation:
 * Dashed Rectangle — shared service
 * Parallelogram — non-existent service or param
 
-**Note:** Graph not working with `AutowireContainer`.
+![graphviz.png](graphviz.png)
 
 ## PSR-11
 Install `psr/container` package first.
