@@ -163,4 +163,28 @@ class BasicTest extends TestCase
         $this->expectExceptionMessage("The resource 'k' already defined");
         $container['k'] = 'v2';
     }
+
+    public function testSymlink()
+    {
+        $container = new Container();
+        $container['k'] = 'v1';
+        $container['k2'] = 'v2';
+
+        $container->symlink('k', 'abstract-k');
+        $this->assertSame('v1', $container['abstract-k']);
+
+        $container->symlink('k2', 'abstract-k');
+        $this->assertSame('v2', $container['abstract-k']);
+    }
+
+    public function testSymlinkFail()
+    {
+        $container = new Container();
+        $container['k'] = 'v1';
+
+        $this->expectException(NotFoundException::class);
+        $this->expectExceptionMessage("The resource 'k2' was not found");
+
+        $container->symlink('k2', 'abstract-k');
+    }
 }

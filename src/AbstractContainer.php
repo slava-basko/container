@@ -46,6 +46,11 @@ abstract class AbstractContainer implements ContainerInterface
     protected $extenders = [];
 
     /**
+     * @var array<non-empty-string, non-empty-string>
+     */
+    protected $symlinks = [];
+
+    /**
      * Checking for cyclic dependency
      *
      * @param non-empty-string $id
@@ -89,6 +94,10 @@ abstract class AbstractContainer implements ContainerInterface
      */
     private function resolve(string $id)
     {
+        if (isset($this->symlinks[$id])) {
+            $id = $this->symlinks[$id];
+        }
+
         if (!$this->has($id)) {
             throw NotFoundException::createFromId($id);
         }
@@ -190,6 +199,21 @@ abstract class AbstractContainer implements ContainerInterface
         InvalidArgumentException::assertNotEmptyString($id, __METHOD__, 1);
 
         $this->extenders[$id][] = $callable;
+    }
+
+    /**
+     * @param non-empty-string $id
+     * @param non-empty-string $symlink
+     * @return void
+     * @throws \SDI\Exception\NotFoundException
+     */
+    public function symlink(string $id, string $symlink)
+    {
+        if (!$this->has($id)) {
+            throw NotFoundException::createFromId($id);
+        }
+
+        $this->symlinks[$symlink] = $id;
     }
 
     /**

@@ -100,12 +100,21 @@ class SomeServiceProvider implements \SDI\ProviderInterface {
     }
 }
 
-class GMySqlClient {
+interface GMySqlInterface {}
+class GMySqlClient implements GMySqlInterface {
     public $dsnString;
 
     public function __construct(string $dsnString){
         $this->dsnString = $dsnString;
-    }}
+    }
+}
+class GMySqlSlaveClient implements GMySqlInterface {
+    public $dsnString;
+
+    public function __construct(string $dsnString){
+        $this->dsnString = $dsnString;
+    }
+}
 class GQueryBuilder {
     public $mysqlClient;
 

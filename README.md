@@ -13,6 +13,7 @@ Zero dependencies and PHP 7.1+.
 * Autowiring: Container will automatically resolve dependencies.
 * Rewrite Protection: Reports about accidental service rewrite.
 * Service Providers: Package your services into a provider for better organization.
+* Symlinks: Runtime hot-swap.
 * Graph: Generate DOT script to visualize dependencies (Graphviz).
 
 ### Simple API
@@ -185,6 +186,21 @@ Then, add the provider to the container.
 ```php
 $container->addProvider(new LoggerServiceProvider());
 ```
+
+### Symlinks
+You can create symlinks that allow you to get different services on the run, without changing user-land code.
+```php
+$container = new Container();
+$container->add(MasterMySqlClient::class, fn (Container $c) => new MasterMySqlClient($container['mysql-dsn']));
+$container->add(SlaveMySqlClient::class, fn (Container $c) => new SlaveMySqlClient($container['mysql-dsn']));
+
+$container->symlink(MasterMySqlClient::class, MySqlInterface::class);
+$container->get(MySqlInterface::class); // MasterMySqlClient
+
+$container->symlink(SlaveMySqlClient::class, MySqlInterface::class);
+$container->get(MySqlInterface::class); // SlaveMySqlClient
+```
+**Note:** Only one symlink to a specific service can exist at a time.
 
 ### Graph
 Using the DOT language, build a graph (as in nodes and edges, not as in bar charts). **Note:** Graph not working 

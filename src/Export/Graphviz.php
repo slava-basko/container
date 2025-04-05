@@ -15,6 +15,7 @@ class Graphviz extends AbstractContainer implements ExportInterface
      *     dependencies: array<non-empty-string>,
      *     factoryParamName: string,
      *     code: mixed,
+     *     symlink: string
      * }>
      */
     private $definitionsMap = [];
@@ -101,6 +102,8 @@ class Graphviz extends AbstractContainer implements ExportInterface
     {
         $this->definitionsMap = [];
 
+        $symlinks = array_flip($this->container->symlinks);
+
         foreach ($this->container->definitions as $definitionKey => $definition) {
             $shared = false;
             if (isset($this->container->sharedServices[$definitionKey])) {
@@ -112,9 +115,15 @@ class Graphviz extends AbstractContainer implements ExportInterface
                 $tags = $this->container->tags[$definitionKey];
             }
 
+            $symlink = '';
+            if (isset($symlinks[$definitionKey])) {
+                $symlink = $symlinks[$definitionKey];
+            }
+
             $definitionParams = [
                 'shared' => $shared,
                 'tags' => $tags,
+                'symlink' => $symlink,
                 'dependencies' => [],
             ];
 
@@ -231,12 +240,16 @@ class Graphviz extends AbstractContainer implements ExportInterface
         $result = array_filter($result);
 
         foreach ($result as $index => $item) {
-            // possible tag or nonexistent service/param
+            // possible tag, symlink or nonexistent service/param
             if (!isset($this->definitionsMap[$item])) {
                 $dependencies = [];
 
                 foreach ($this->definitionsMap as $id => $definition) {
                     if (\in_array($item, $definition['tags'])) {
+                        $dependencies[] = $id;
+                    }
+
+                    if ($item == $definition['symlink']) {
                         $dependencies[] = $id;
                     }
                 }
@@ -322,6 +335,11 @@ class Graphviz extends AbstractContainer implements ExportInterface
         $nodes = [];
 
         foreach ($this->definitionsMap as $id => $params) {
+            $append = '';
+            if (\strlen($params['symlink']) > 0) {
+                $append = '\n(' . $params['symlink'] . ')';
+            }
+
             if (\class_exists($id)) {
                 $optionsKey = $params['shared'] ? 'node.definition.shared' : 'node.definition';
 
@@ -330,12 +348,12 @@ class Graphviz extends AbstractContainer implements ExportInterface
 //                }
 
                 $nodes[$id] = [
-                    'class' => \str_replace('\\', '\\\\', $id),
+                    'class' => \str_replace('\\', '\\\\', $id) . $append,
                     'attributes' => $this->options[$optionsKey],
                 ];
             } else {
                 $nodes[$id] = [
-                    'class' => $id,
+                    'class' => $id . $append,
                     'attributes' => $this->options['node.param'],
                 ];
             }

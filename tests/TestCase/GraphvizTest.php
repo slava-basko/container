@@ -15,31 +15,36 @@ class GraphvizTest extends TestCase
         $container['redis-dsn'] = 'redis:bla';
         $container['export-path'] = '/var/log/export';
 
+        $container->addShared(\GMySqlClient::class, function (Container $container) {
+            return new \GMySqlClient($container['mysql-dsn']);
+        });
+        $container->addShared(\GMySqlSlaveClient::class, function (Container $container) {
+            return new \GMySqlSlaveClient($container['mysql-dsn']);
+        });
+        $container->symlink(\GMySqlClient::class, \GMySqlInterface::class);
+
         $container->add(\GLoggerFileHandler::class, function (Container $c) {
             return new \GLoggerFileHandler($c['logfile-path']);
         }, ['handler']);
         $container->add(\GLoggerDbHandler::class, function (Container $c) {
-            return new \GLoggerDbHandler($c[\GMySqlClient::class]);
+            return new \GLoggerDbHandler($c[\GMySqlInterface::class]);
         }, ['handler']);
         $container->add(\GLogger::class, function (Container $c) {
             return new \GLogger($c->getByTag('handler'));
         });
 
-        $container->addShared(\GMySqlClient::class, function (Container $container) {
-            return new \GMySqlClient($container['mysql-dsn']);
-        });
         $container->add(\GQueryBuilder::class, function (Container $container) {
-            return new \GQueryBuilder($container->get(\GMySqlClient::class));
+            return new \GQueryBuilder($container->get(\GMySqlInterface::class));
         });
         $container->addShared(\GRedisClient::class, function (Container $container) {
             return new \GRedisClient($container['redis-dsn']);
         });
 
         $container->add(\GUsersRepository::class, function (Container $c) {
-            return new \GUsersRepository($c[\GMySqlClient::class]);
+            return new \GUsersRepository($c[\GMySqlInterface::class]);
         });
         $container->add(\GPostsRepository::class, function (Container $c) {
-            return new \GPostsRepository($c[\GMySqlClient::class]);
+            return new \GPostsRepository($c[\GMySqlInterface::class]);
         });
         $container->add(\GSessionsHandler::class, function (Container $c) {
             return new \GSessionsHandler($c[\GLogger::class], $c[\GRedisClient::class]);
@@ -66,10 +71,11 @@ class GraphvizTest extends TestCase
   node_mysql_dsn [label="mysql-dsn", shape="oval", style="filled", fillcolor="#d4d7ff"];
   node_redis_dsn [label="redis-dsn", shape="oval", style="filled", fillcolor="#d4d7ff"];
   node_export_path [label="export-path", shape="oval", style="filled", fillcolor="#d4d7ff"];
+  node_GMySqlClient [label="GMySqlClient\n(GMySqlInterface)", shape="record", style="filled, dashed", fillcolor="#eeeeee"];
+  node_GMySqlSlaveClient [label="GMySqlSlaveClient", shape="record", style="filled, dashed", fillcolor="#eeeeee"];
   node_GLoggerFileHandler [label="GLoggerFileHandler", shape="record", style="filled", fillcolor="#eeeeee"];
   node_GLoggerDbHandler [label="GLoggerDbHandler", shape="record", style="filled", fillcolor="#eeeeee"];
   node_GLogger [label="GLogger", shape="record", style="filled", fillcolor="#eeeeee"];
-  node_GMySqlClient [label="GMySqlClient", shape="record", style="filled, dashed", fillcolor="#eeeeee"];
   node_GQueryBuilder [label="GQueryBuilder", shape="record", style="filled", fillcolor="#eeeeee"];
   node_GRedisClient [label="GRedisClient", shape="record", style="filled, dashed", fillcolor="#eeeeee"];
   node_GUsersRepository [label="GUsersRepository", shape="record", style="filled", fillcolor="#eeeeee"];
@@ -79,11 +85,12 @@ class GraphvizTest extends TestCase
   node_GUsersExportService [label="GUsersExportService", shape="record", style="filled", fillcolor="#eeeeee"];
   node_GExportBuilder [label="GExportBuilder", shape="record", style="filled", fillcolor="#eeeeee"];
   node_logfile_path [label="logfile-path", shape="parallelogram", style="filled, dotted", fillcolor="#ffbfbe"];
+  node_GMySqlClient -> node_mysql_dsn [style="filled"];
+  node_GMySqlSlaveClient -> node_mysql_dsn [style="filled"];
   node_GLoggerFileHandler -> node_logfile_path [style="filled"];
   node_GLoggerDbHandler -> node_GMySqlClient [style="filled"];
   node_GLogger -> node_GLoggerFileHandler [style="filled"];
   node_GLogger -> node_GLoggerDbHandler [style="filled"];
-  node_GMySqlClient -> node_mysql_dsn [style="filled"];
   node_GQueryBuilder -> node_GMySqlClient [style="filled"];
   node_GRedisClient -> node_redis_dsn [style="filled"];
   node_GUsersRepository -> node_GMySqlClient [style="filled"];
