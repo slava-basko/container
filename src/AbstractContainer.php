@@ -3,6 +3,7 @@
 namespace SDI;
 
 use SDI\Exception\CircularDependencyException;
+use SDI\Exception\ContainerException;
 use SDI\Exception\InvalidArgumentException;
 use SDI\Exception\NotFoundException;
 use SDI\Exception\RewriteAttemptException;
@@ -206,9 +207,14 @@ abstract class AbstractContainer implements ContainerInterface
      * @param non-empty-string $symlink
      * @return void
      * @throws \SDI\Exception\NotFoundException
+     * @throws \SDI\Exception\ContainerException
      */
     public function symlink(string $id, string $symlink)
     {
+        if ($id === $symlink) {
+            throw ContainerException::createIdEqualSymlink();
+        }
+
         if (!$this->has($id)) {
             throw NotFoundException::createFromId($id);
         }
