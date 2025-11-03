@@ -191,8 +191,8 @@ $container->addProvider(new LoggerServiceProvider());
 You can create symlinks that allow you to get different services on the run, without changing user-land code.
 ```php
 $container = new Container();
-$container->add(MasterMySqlClient::class, fn (Container $c) => new MasterMySqlClient($container['mysql-dsn']));
-$container->add(SlaveMySqlClient::class, fn (Container $c) => new SlaveMySqlClient($container['mysql-dsn']));
+$container->add(MasterMySqlClient::class, fn (Container $c) => new MasterMySqlClient($c['mysql-dsn']));
+$container->add(SlaveMySqlClient::class, fn (Container $c) => new SlaveMySqlClient($c['mysql-dsn']));
 
 $container->symlink(MasterMySqlClient::class, MySqlInterface::class);
 $container->get(MySqlInterface::class); // MasterMySqlClient
