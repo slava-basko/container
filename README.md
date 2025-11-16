@@ -174,8 +174,8 @@ There will be no hidden overwrites.
 ### Service Providers
 Providers give you the benefit of organizing your definitions.
 ```php
-class LoggerServiceProvider implements ProviderInterface {
-    public function register(Container $container): void
+class LoggerServiceProvider {
+    public function __invoke(Container $container): void
     {
         // Define your handlers, formatters, processors, and logger itself.
         // All Logger-related things are in one place.

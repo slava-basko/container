@@ -87,8 +87,8 @@ class DbConnection {
     }
 }
 
-class SomeServiceProvider implements \SDI\ProviderInterface {
-    public function register(\SDI\ContainerInterface $container): void
+class SomeServiceProvider {
+    public function __invoke(\SDI\ContainerInterface $container): void
     {
         $container['from-service-provider'] = 123;
         $container['from-service-provider-2'] = [$this, 'registerService2'];

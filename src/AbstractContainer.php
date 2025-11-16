@@ -223,12 +223,12 @@ abstract class AbstractContainer implements ContainerInterface
     }
 
     /**
-     * @param \SDI\ProviderInterface $provider
+     * @param callable(\SDI\ContainerInterface):void $provider
      * @return void
      */
-    public function addProvider(ProviderInterface $provider)
+    public function addProvider(callable $provider)
     {
-        $provider->register($this);
+        $provider($this);
     }
 
     /**
